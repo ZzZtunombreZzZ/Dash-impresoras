@@ -1,0 +1,11 @@
+{
+    "community": "public",
+    "alerts_threshold_paper": 20,
+    "trays": {
+        "2": "Depósito 1",
+        "3": "Depósito 2",
+        "4": "Depósito 3",
+        "5": "Depósito 4"
+    },
+    "devices": {}
+}

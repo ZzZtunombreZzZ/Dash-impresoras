@@ -1,0 +1,17 @@
+# Dependencias de Node
+node_modules/
+
+# Entorno virtual de Python
+.venv/
+
+# Binario portable de Node
+.node/
+
+# Estado dinámico de impresoras
+src/core/storage/printers_state.json
+
+# Usuarios y teléfonos de turno (Contiene datos de contacto reales, usar plantilla para Git)
+src/core/storage/users.json
+
+# Notas de desarrollo
+claude.md
