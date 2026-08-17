@@ -28,7 +28,7 @@ TRAY_NAMES = {int(k): v for k, v in config.get("trays", {}).items()}
 
 # Mapear dispositivos y alias
 PRINTERS = {ip: dev["nombre"] for ip, dev in config.get("devices", {}).items()}
-PRINTER_ALIASES = {ip: dev["aliases"] for ip, dev in config.get("devices", {}).items()}
+PRINTER_ALIASES = {ip: dev.get("aliases", []) for ip, dev in config.get("devices", {}).items()}
 
 OID_CAP       = "1.3.6.1.2.1.43.8.2.1.9.1."
 OID_LEVEL     = "1.3.6.1.2.1.43.8.2.1.10.1."
@@ -105,7 +105,7 @@ def obtener_estado_impresoras():
         with open(config_path, "r", encoding="utf-8") as f:
             config = json.load(f)
         PRINTERS = {ip: dev["nombre"] for ip, dev in config.get("devices", {}).items()}
-        PRINTER_ALIASES = {ip: dev["aliases"] for ip, dev in config.get("devices", {}).items()}
+        PRINTER_ALIASES = {ip: dev.get("aliases", []) for ip, dev in config.get("devices", {}).items()}
     except Exception as e:
         print(f"❌ Error al recargar config en monitor: {e}")
 
@@ -246,6 +246,16 @@ revisar_impresoras()
 schedule.every(10).minutes.do(revisar_impresoras)
 print(f"\nMonitor activo. Revisando cada 10 min...\n")
 
+last_mtime = os.path.getmtime(config_path)
+
 while True:
     schedule.run_pending()
+    try:
+        mtime = os.path.getmtime(config_path)
+        if mtime != last_mtime:
+            last_mtime = mtime
+            print("\n🔄 printers.json modificado, releyendo de inmediato...")
+            revisar_impresoras()
+    except FileNotFoundError:
+        pass
     time.sleep(1)

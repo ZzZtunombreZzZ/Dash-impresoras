@@ -113,10 +113,30 @@ toggleViewBtn.addEventListener('click', () => {
     updateDashboard();
 });
 
-refreshBtn.addEventListener('click', () => {
+refreshBtn.addEventListener('click', async () => {
     if (isRefreshing) return;
-    triggerRefreshAnimation();
-    updateDashboard();
+    isRefreshing = true;
+    refreshBtn.classList.add('spin');
+
+    let previaActualizacion = null;
+    try {
+        const prev = await (await fetch('/api/datos')).json();
+        previaActualizacion = prev.ultima_actualizacion;
+    } catch {}
+
+    try { await fetch('/api/refrescar', { method: 'POST' }); } catch {}
+
+    for (let i = 0; i < 6; i++) {
+        await new Promise(r => setTimeout(r, 500));
+        try {
+            const data = await (await fetch('/api/datos')).json();
+            if (data.ultima_actualizacion !== previaActualizacion) break;
+        } catch {}
+    }
+
+    await updateDashboard();
+    refreshBtn.classList.remove('spin');
+    isRefreshing = false;
 });
 
 function triggerRefreshAnimation() {

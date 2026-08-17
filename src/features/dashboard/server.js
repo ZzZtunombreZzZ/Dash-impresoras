@@ -96,7 +96,19 @@ const server = http.createServer((req, res) => {
         }
     }
 
-
+    if (url === '/api/refrescar' && req.method === 'POST') {
+        const cfgPath = path.join(__dirname, '../../core/config/printers.json');
+        const now = new Date();
+        fs.utimes(cfgPath, now, now, err => {
+            if (err) {
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                return res.end(JSON.stringify({ error: err.message }));
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ ok: true }));
+        });
+        return;
+    }
 
 
     // Archivos estáticos en la carpeta PUBLIC_DIR
